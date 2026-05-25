@@ -94,7 +94,7 @@ export default function RiceDetail({
 
   function openBmac() {
     if (!rice?.author_bmac) return;
-    window.open(`https://buymeacoffee.com/${rice.author_bmac}`, "_blank");
+    window.open(`https://ko-fi.com/${rice.author_bmac}`, "_blank");
   }
 
   if (loading) {
@@ -291,7 +291,7 @@ export default function RiceDetail({
                   size="lg"
                 >
                   <Coffee className="w-5 h-5" />
-                  Buy me a coffee
+                  Support on Ko-fi
                 </Button>
               )}
             </div>

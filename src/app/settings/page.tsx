@@ -155,11 +155,11 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Coffee className="w-4 h-4 text-[#FFDD00]" />
-                  Buy Me a Coffee username
+                  Ko-fi username
                 </label>
                 <div className="flex items-center gap-0">
                   <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-white/5 border border-r-0 border-white/10 rounded-l-lg">
-                    buymeacoffee.com/
+                    ko-fi.com/
                   </span>
                   <Input
                     value={bmac}
@@ -169,10 +169,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Visitors can tip you directly through Buy Me a Coffee.
+                  Visitors can tip you directly through Ko-fi.
                   {" "}
                   <a
-                    href="https://buymeacoffee.com"
+                    href="https://ko-fi.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:underline"
