@@ -140,6 +140,22 @@ export async function getProfile(client: Client, userId: string): Promise<Databa
   return data as Database["public"]["Tables"]["profiles"]["Row"];
 }
 
+export async function deleteRice(client: Client, riceId: string) {
+  const { data: screenshots } = await client
+    .from("screenshots")
+    .select("storage_path")
+    .eq("rice_id", riceId);
+
+  if (screenshots && screenshots.length > 0) {
+    await client.storage
+      .from("screenshots")
+      .remove(screenshots.map((s) => s.storage_path));
+  }
+
+  const { error } = await client.from("rices").delete().eq("id", riceId);
+  if (error) throw error;
+}
+
 export async function getRicesByUser(client: Client, userId: string) {
   const { data, error } = await client
     .from("rices")

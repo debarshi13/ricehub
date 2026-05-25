@@ -3,12 +3,13 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { getProfile, getRicesByUser, getScreenshotUrl } from "@/lib/supabase/queries";
+import { getProfile, getRicesByUser, getScreenshotUrl, deleteRice } from "@/lib/supabase/queries";
 import { RiceCard } from "@/components/rice-card";
 import { SleepyRiceBowl } from "@/components/rice-illustration";
+import { useAuth } from "@/lib/supabase/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Terminal, Upload, ExternalLink } from "lucide-react";
+import { ArrowLeft, Terminal, Upload, ExternalLink, Trash2 } from "lucide-react";
 import type { Database } from "@/lib/supabase/types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -38,6 +39,8 @@ export default function ProfilePage({
     }>
   >([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const isOwnProfile = user?.id === id;
 
   useEffect(() => {
     async function load() {
@@ -88,6 +91,17 @@ export default function ProfilePage({
     }
     load();
   }, [id]);
+
+  async function handleDelete(riceId: string) {
+    if (!confirm("Delete this rice? This cannot be undone.")) return;
+    try {
+      const supabase = createClient();
+      await deleteRice(supabase, riceId);
+      setRices(rices.filter((r) => r.id !== riceId));
+    } catch {
+      alert("Failed to delete rice.");
+    }
+  }
 
   if (loading) {
     return (
@@ -186,7 +200,17 @@ export default function ProfilePage({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rices.map((rice) => (
-                  <RiceCard key={rice.id} rice={rice} />
+                  <div key={rice.id} className="relative group">
+                    <RiceCard rice={rice} />
+                    {isOwnProfile && (
+                      <button
+                        onClick={() => handleDelete(rice.id)}
+                        className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
