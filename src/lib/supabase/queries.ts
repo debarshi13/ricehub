@@ -141,15 +141,15 @@ export async function getProfile(client: Client, userId: string): Promise<Databa
 }
 
 export async function deleteRice(client: Client, riceId: string) {
-  const { data: screenshots } = await client
-    .from("screenshots")
+  const { data: screenshots } = await (client
+    .from("screenshots") as AnyRice)
     .select("storage_path")
     .eq("rice_id", riceId);
 
   if (screenshots && screenshots.length > 0) {
     await client.storage
       .from("screenshots")
-      .remove(screenshots.map((s) => s.storage_path));
+      .remove(screenshots.map((s: { storage_path: string }) => s.storage_path));
   }
 
   const { error } = await client.from("rices").delete().eq("id", riceId);
