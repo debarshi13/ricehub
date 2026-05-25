@@ -10,7 +10,7 @@ import { RiceBowl, SleepyRiceBowl } from "@/components/rice-illustration";
 import { createClient } from "@/lib/supabase/client";
 import { getRices, getScreenshotUrl } from "@/lib/supabase/queries";
 import type { Rice as MockRice } from "@/lib/mock-data";
-import { Upload, ArrowDown } from "lucide-react";
+import { Upload, ArrowDown, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -175,9 +175,18 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-white/5 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
+      <footer className="border-t border-white/5 py-10 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <span className="font-heading">RiceHub</span>
+          <a
+            href="https://buymeacoffee.com/ricehub"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FFDD00] hover:bg-[#FFDD00]/80 text-black text-xs font-semibold cursor-pointer transition-colors"
+          >
+            <Heart className="w-3.5 h-3.5" />
+            Support RiceHub
+          </a>
           <span>For the r/unixporn community</span>
         </div>
       </footer>

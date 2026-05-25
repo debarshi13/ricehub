@@ -4,8 +4,7 @@ import { use, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { getRiceById, getScreenshotUrl, sendTip } from "@/lib/supabase/queries";
-import { useAuth } from "@/lib/supabase/use-auth";
+import { getRiceById, getScreenshotUrl } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +30,7 @@ type RiceData = {
   created_at: string;
   author_name: string;
   author_id: string;
+  author_bmac: string | null;
   screenshots: string[];
   tip_count: number;
 };
@@ -41,11 +41,9 @@ export default function RiceDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { user } = useAuth();
   const [rice, setRice] = useState<RiceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentScreenshot, setCurrentScreenshot] = useState(0);
-  const [tipped, setTipped] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -76,6 +74,7 @@ export default function RiceDetail({
           created_at: data.created_at.split("T")[0],
           author_name: data.profiles?.username ?? "unknown",
           author_id: data.author_id,
+          author_bmac: data.profiles?.buymeacoffee ?? null,
           screenshots:
             screenshots.length > 0
               ? screenshots
@@ -93,16 +92,9 @@ export default function RiceDetail({
     load();
   }, [id]);
 
-  async function handleTip() {
-    if (!user || !rice || tipped) return;
-    try {
-      const supabase = createClient();
-      await sendTip(supabase, rice.id, user.id);
-      setTipped(true);
-      setRice({ ...rice, tip_count: rice.tip_count + 1 });
-    } catch {
-      // Tip failed
-    }
+  function openBmac() {
+    if (!rice?.author_bmac) return;
+    window.open(`https://buymeacoffee.com/${rice.author_bmac}`, "_blank");
   }
 
   if (loading) {
@@ -141,14 +133,13 @@ export default function RiceDetail({
               RiceHub
             </span>
           </Link>
-          {user && (
+          {rice?.author_bmac && (
             <Button
-              onClick={handleTip}
-              disabled={tipped}
+              onClick={openBmac}
               className="cursor-pointer gap-2 bg-success hover:bg-success/80"
             >
               <Coffee className="w-4 h-4" />
-              {tipped ? "Thanks!" : "Tip creator"}
+              Tip creator
             </Button>
           )}
         </div>
@@ -293,15 +284,14 @@ export default function RiceDetail({
                 </a>
               )}
 
-              {user && (
+              {rice.author_bmac && (
                 <Button
-                  onClick={handleTip}
-                  disabled={tipped}
-                  className="w-full cursor-pointer gap-2 h-12 text-base bg-success hover:bg-success/80"
+                  onClick={openBmac}
+                  className="w-full cursor-pointer gap-2 h-12 text-base bg-[#FFDD00] hover:bg-[#FFDD00]/80 text-black font-semibold"
                   size="lg"
                 >
                   <Coffee className="w-5 h-5" />
-                  {tipped ? "Thanks for the tip!" : "Buy me a coffee"}
+                  Buy me a coffee
                 </Button>
               )}
             </div>

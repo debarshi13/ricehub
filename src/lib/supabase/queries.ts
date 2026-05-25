@@ -129,7 +129,7 @@ export async function sendTip(
   if (error) throw error;
 }
 
-export async function getProfile(client: Client, userId: string) {
+export async function getProfile(client: Client, userId: string): Promise<Database["public"]["Tables"]["profiles"]["Row"]> {
   const { data, error } = await client
     .from("profiles")
     .select("*")
@@ -137,7 +137,7 @@ export async function getProfile(client: Client, userId: string) {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as Database["public"]["Tables"]["profiles"]["Row"];
 }
 
 export async function getRicesByUser(client: Client, userId: string) {

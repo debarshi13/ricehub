@@ -9,6 +9,7 @@ export type Database = {
           avatar_url: string | null;
           bio: string | null;
           github_url: string | null;
+          buymeacoffee: string | null;
           created_at: string;
         };
         Insert: {
@@ -18,6 +19,7 @@ export type Database = {
           avatar_url?: string | null;
           bio?: string | null;
           github_url?: string | null;
+          buymeacoffee?: string | null;
         };
         Update: {
           username?: string;
@@ -25,6 +27,7 @@ export type Database = {
           avatar_url?: string | null;
           bio?: string | null;
           github_url?: string | null;
+          buymeacoffee?: string | null;
         };
       };
       rices: {

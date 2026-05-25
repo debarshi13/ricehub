@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Upload, Terminal, LogIn, LogOut } from "lucide-react";
+import { Search, Upload, Terminal, LogIn, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/lib/supabase/use-auth";
 
 export function Navbar({
@@ -48,6 +48,15 @@ export function Navbar({
                 >
                   <Upload className="w-4 h-4" />
                   Upload
+                </Button>
+              </Link>
+              <Link href="/settings">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  <Settings className="w-4 h-4" />
                 </Button>
               </Link>
               <Link href={`/profile/${user.id}`}>
