@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { RiceBowl } from "@/components/rice-illustration";
 import { useAuth } from "@/lib/supabase/use-auth";
+import { useScrollOpacity } from "@/components/navbar";
 import { createClient } from "@/lib/supabase/client";
 import { createRice, uploadScreenshot, addScreenshot } from "@/lib/supabase/queries";
 import {
@@ -23,6 +24,7 @@ import { WM_OPTIONS } from "@/lib/mock-data";
 export default function UploadPage() {
   const { user, loading, signInWithGitHub } = useAuth();
   const router = useRouter();
+  const navOpacity = useScrollOpacity();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
@@ -136,7 +138,10 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen">
-      <nav className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl">
+      <nav
+        className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl transition-opacity duration-150"
+        style={{ opacity: navOpacity, pointerEvents: navOpacity < 0.1 ? "none" : "auto" }}
+      >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/"

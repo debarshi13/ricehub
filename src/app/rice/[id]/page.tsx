@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getRiceById, getScreenshotUrl } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useScrollOpacity } from "@/components/navbar";
 import {
   ArrowLeft,
   Coffee,
@@ -44,6 +45,7 @@ export default function RiceDetail({
   const [rice, setRice] = useState<RiceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentScreenshot, setCurrentScreenshot] = useState(0);
+  const navOpacity = useScrollOpacity();
 
   useEffect(() => {
     async function load() {
@@ -121,7 +123,10 @@ export default function RiceDetail({
 
   return (
     <div className="min-h-screen">
-      <nav className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl">
+      <nav
+        className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl transition-opacity duration-150"
+        style={{ opacity: navOpacity, pointerEvents: navOpacity < 0.1 ? "none" : "auto" }}
+      >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/"

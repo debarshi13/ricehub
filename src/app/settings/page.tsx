@@ -8,10 +8,12 @@ import { RiceBowl } from "@/components/rice-illustration";
 import { useAuth } from "@/lib/supabase/use-auth";
 import { createClient } from "@/lib/supabase/client";
 import { getProfile } from "@/lib/supabase/queries";
+import { useScrollOpacity } from "@/components/navbar";
 import { ArrowLeft, Terminal, Save, LogIn, Coffee } from "lucide-react";
 
 export default function SettingsPage() {
   const { user, loading: authLoading, signInWithGitHub } = useAuth();
+  const navOpacity = useScrollOpacity();
 
   const [bio, setBio] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
@@ -99,7 +101,10 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen">
-      <nav className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl">
+      <nav
+        className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl transition-opacity duration-150"
+        style={{ opacity: navOpacity, pointerEvents: navOpacity < 0.1 ? "none" : "auto" }}
+      >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/"

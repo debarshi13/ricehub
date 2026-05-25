@@ -1,11 +1,29 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Upload, Terminal, LogIn, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/lib/supabase/use-auth";
+
+export function useScrollOpacity(fadeStart = 50, fadeEnd = 200) {
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      if (y <= fadeStart) setOpacity(1);
+      else if (y >= fadeEnd) setOpacity(0);
+      else setOpacity(1 - (y - fadeStart) / (fadeEnd - fadeStart));
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [fadeStart, fadeEnd]);
+
+  return opacity;
+}
 
 export function Navbar({
   search,
@@ -15,9 +33,13 @@ export function Navbar({
   onSearchChange: (value: string) => void;
 }) {
   const { user, loading, signInWithGitHub, signOut } = useAuth();
+  const opacity = useScrollOpacity();
 
   return (
-    <nav className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl">
+    <nav
+      className="fixed top-4 left-4 right-4 z-50 glass-strong rounded-2xl transition-opacity duration-150"
+      style={{ opacity, pointerEvents: opacity < 0.1 ? "none" : "auto" }}
+    >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <Terminal className="w-6 h-6 text-primary" />
