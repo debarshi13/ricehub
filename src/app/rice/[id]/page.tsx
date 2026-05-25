@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { getRiceById, getScreenshotUrl } from "@/lib/supabase/queries";
+import { getRiceById, getScreenshotUrl, incrementDownloads } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useScrollOpacity } from "@/components/navbar";
@@ -271,22 +271,20 @@ export default function RiceDetail({
               </div>
 
               {rice.dots_url && (
-                <a
-                  href={rice.dots_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass rounded-xl p-6 flex items-center justify-between cursor-pointer hover:border-primary/30 transition-colors block"
+                <Button
+                  onClick={async () => {
+                    const supabase = createClient();
+                    try { await incrementDownloads(supabase, rice.id); } catch {}
+                    setRice({ ...rice, downloads: rice.downloads + 1 });
+                    window.open(rice.dots_url!, "_blank");
+                  }}
+                  variant="outline"
+                  className="w-full cursor-pointer gap-2 h-12 text-base border-white/10 hover:border-primary/30"
+                  size="lg"
                 >
-                  <div className="space-y-1">
-                    <p className="font-heading font-semibold text-sm">
-                      Dotfiles
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      View on GitHub
-                    </p>
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                </a>
+                  <Download className="w-5 h-5" />
+                  Download Dotfiles
+                </Button>
               )}
 
               {rice.author_bmac && (

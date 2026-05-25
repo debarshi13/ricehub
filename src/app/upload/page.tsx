@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { RiceBowl } from "@/components/rice-illustration";
 import { useAuth } from "@/lib/supabase/use-auth";
 import { useScrollOpacity } from "@/components/navbar";
 import { createClient } from "@/lib/supabase/client";
-import { createRice, uploadScreenshot, addScreenshot } from "@/lib/supabase/queries";
+import { createRice, uploadScreenshot, addScreenshot, getProfile } from "@/lib/supabase/queries";
 import {
   ArrowLeft,
   Upload,
@@ -18,6 +18,7 @@ import {
   X,
   Terminal,
   LogIn,
+  Coffee,
 } from "lucide-react";
 import { WM_OPTIONS } from "@/lib/mock-data";
 
@@ -36,8 +37,19 @@ export default function UploadPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [kofi, setKofi] = useState("");
+  const [kofiLoaded, setKofiLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    getProfile(supabase, user.id).then((p) => {
+      setKofi(p.buymeacoffee ?? "");
+      setKofiLoaded(true);
+    }).catch(() => setKofiLoaded(true));
+  }, [user]);
 
   function addTag() {
     const tag = tagInput.trim().toLowerCase();
@@ -93,6 +105,13 @@ export default function UploadPage() {
       for (let i = 0; i < files.length; i++) {
         const path = await uploadScreenshot(supabase, files[i], rice.id, i);
         await addScreenshot(supabase, rice.id, path, i);
+      }
+
+      if (kofi) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from("profiles") as any)
+          .update({ buymeacoffee: kofi })
+          .eq("id", user.id);
       }
 
       router.push(`/rice/${rice.id}`);
@@ -320,6 +339,30 @@ export default function UploadPage() {
                 className="bg-white/5 border-white/10 focus:border-primary/50"
               />
             </div>
+
+            {/* Ko-fi */}
+            {kofiLoaded && !kofi && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Coffee className="w-4 h-4 text-[#FFDD00]" />
+                  Ko-fi username
+                </label>
+                <div className="flex items-center gap-0">
+                  <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-white/5 border border-r-0 border-white/10 rounded-l-lg">
+                    ko-fi.com/
+                  </span>
+                  <Input
+                    value={kofi}
+                    onChange={(e) => setKofi(e.target.value)}
+                    placeholder="yourusername"
+                    className="bg-white/5 border-white/10 focus:border-primary/50 rounded-l-none"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Add your Ko-fi so visitors can tip you directly.
+                </p>
+              </div>
+            )}
 
             {error && (
               <p className="text-sm text-destructive">{error}</p>

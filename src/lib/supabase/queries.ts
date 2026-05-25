@@ -140,6 +140,11 @@ export async function getProfile(client: Client, userId: string): Promise<Databa
   return data as Database["public"]["Tables"]["profiles"]["Row"];
 }
 
+export async function incrementDownloads(client: Client, riceId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (client as any).rpc("increment_downloads", { rice_id: riceId });
+}
+
 export async function deleteRice(client: Client, riceId: string) {
   const { data: screenshots } = await (client
     .from("screenshots") as AnyRice)
