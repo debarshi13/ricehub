@@ -1,93 +1,66 @@
-"use client";
-
-export const dynamic = "force-dynamic";
-
-import { useState, useEffect, useMemo } from "react";
-import { Navbar } from "@/components/navbar";
-import { RiceCard } from "@/components/rice-card";
-import { WmFilter } from "@/components/wm-filter";
-import { RiceBowl, SleepyRiceBowl } from "@/components/rice-illustration";
-import { createClient } from "@/lib/supabase/client";
-import { getRices, getScreenshotUrl } from "@/lib/supabase/queries";
-import type { Rice as MockRice } from "@/lib/mock-data";
+import { Suspense } from "react";
+import { HomeClient } from "@/components/home-client";
+import { RiceBowl } from "@/components/rice-illustration";
+import { getServerRices } from "@/lib/supabase/server-queries";
 import { Upload, ArrowDown, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "RiceHub — Share & Browse Linux Desktop Rices",
+  description:
+    "Browse, share, and download Linux desktop configurations (rices). Hyprland, i3, sway, bspwm, KDE, GNOME and more. The home for r/unixporn.",
+  keywords: [
+    "linux rice",
+    "linux ricing",
+    "unixporn",
+    "linux desktop",
+    "dotfiles",
+    "hyprland",
+    "i3wm",
+    "sway",
+    "bspwm",
+    "linux customization",
+    "desktop customization",
+    "window manager",
+    "linux themes",
+    "rice sharing",
+  ],
+  openGraph: {
+    title: "RiceHub — Where rices find a home",
+    description:
+      "Browse, share, and download Linux desktop rices. Hyprland, i3, sway, bspwm, and more.",
+    url: "https://ricehub.fun",
+    siteName: "RiceHub",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RiceHub — Where rices find a home",
+    description:
+      "Browse, share, and download Linux desktop rices.",
+  },
+  alternates: {
+    canonical: "https://ricehub.fun",
+  },
+};
+
+async function RiceBrowse() {
+  let rices: Awaited<ReturnType<typeof getServerRices>> = [];
+  try {
+    rices = await getServerRices();
+  } catch {
+    rices = [];
+  }
+  return <HomeClient rices={rices} />;
+}
 
 export default function Home() {
-  const [search, setSearch] = useState("");
-  const [wmFilter, setWmFilter] = useState("All");
-  const [rices, setRices] = useState<MockRice[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const supabase = createClient();
-        const data = await getRices(supabase);
-
-        const mapped = await Promise.all(
-          data.map(async (r) => {
-            const screenshots = await Promise.all(
-              (r.screenshots ?? [])
-                .sort(
-                  (a: { display_order: number }, b: { display_order: number }) =>
-                    a.display_order - b.display_order
-                )
-                .map((s: { storage_path: string }) =>
-                  getScreenshotUrl(supabase, s.storage_path)
-                )
-            );
-
-            return {
-              id: r.id,
-              title: r.title,
-              author: r.profiles?.username ?? "unknown",
-              authorAvatar: r.profiles?.avatar_url ?? "",
-              wm: r.wm,
-              distro: r.distro,
-              tags: r.tags,
-              screenshots:
-                screenshots.length > 0
-                  ? screenshots
-                  : [
-                      `https://placehold.co/1920x1080/1a1520/f8fafc?text=${encodeURIComponent(r.title)}`,
-                    ],
-              description: r.description,
-              dots: r.dots_url ?? "",
-              tips: r.tip_count,
-              downloads: r.downloads,
-              createdAt: r.created_at.split("T")[0],
-            };
-          })
-        );
-
-        setRices(mapped);
-      } catch {
-        // Supabase not configured yet — show empty state
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
-
-  const filtered = useMemo(() => {
-    return rices.filter((rice) => {
-      const matchesWm = wmFilter === "All" || rice.wm === wmFilter;
-      const matchesSearch =
-        !search ||
-        rice.title.toLowerCase().includes(search.toLowerCase()) ||
-        rice.author.toLowerCase().includes(search.toLowerCase()) ||
-        rice.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
-      return matchesWm && matchesSearch;
-    });
-  }, [rices, search, wmFilter]);
-
   return (
     <>
-      <Navbar search={search} onSearchChange={setSearch} />
-
       <section className="relative min-h-[90vh] flex items-center justify-center px-6 pt-24 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[150px]" />
@@ -130,48 +103,15 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="browse" className="px-6 pb-24 pt-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="space-y-4">
-            <h2 className="font-heading text-2xl font-bold">Browse rices</h2>
-            <WmFilter selected={wmFilter} onSelect={setWmFilter} />
+      <Suspense
+        fallback={
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           </div>
-
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-6">
-              <SleepyRiceBowl className="w-32 h-32 opacity-80" />
-              <div className="text-center space-y-2">
-                <p className="font-heading text-lg text-muted-foreground">
-                  No rices here yet
-                </p>
-                <p className="text-sm text-muted-foreground/60 max-w-sm">
-                  This bowl is empty. Be the first to share your desktop config
-                  and inspire the community.
-                </p>
-              </div>
-              <Link href="/upload">
-                <Button
-                  variant="outline"
-                  className="cursor-pointer gap-2 border-white/10 hover:border-primary/30 hover:text-primary"
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload a rice
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((rice) => (
-                <RiceCard key={rice.id} rice={rice} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+        }
+      >
+        <RiceBrowse />
+      </Suspense>
 
       <footer className="border-t border-white/5 py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">

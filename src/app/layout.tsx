@@ -15,9 +15,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RiceHub — Linux Rice Marketplace",
+  title: {
+    default: "RiceHub — Share & Browse Linux Desktop Rices",
+    template: "%s | RiceHub",
+  },
   description:
-    "Browse, share, and support Linux desktop configurations. The home for r/unixporn.",
+    "Browse, share, and download Linux desktop configurations (rices). Hyprland, i3, sway, bspwm, KDE, GNOME and more. The home for r/unixporn.",
+  metadataBase: new URL("https://ricehub.fun"),
 };
 
 export default function RootLayout({
