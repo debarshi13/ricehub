@@ -179,7 +179,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <span className="font-heading">RiceHub</span>
           <a
-            href="https://buymeacoffee.com/ricehub"
+            href="https://buymeacoffee.com/cubegamerdev"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FFDD00] hover:bg-[#FFDD00]/80 text-black text-xs font-semibold cursor-pointer transition-colors"
