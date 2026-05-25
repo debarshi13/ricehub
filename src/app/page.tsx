@@ -99,15 +99,13 @@ export default function Home() {
 
           <div className="space-y-4">
             <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-              Where Linux desktops
+              Where rices
               <br />
               find a <span className="text-primary">home</span>
               <span className="text-muted-foreground">.</span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
-              Share your rice. Support your favorite creators.
-              <br />
-              No paywalls, no gatekeeping — just dotfiles and good taste.
+              Just click share!
             </p>
           </div>
 
